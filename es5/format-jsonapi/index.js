@@ -40,6 +40,16 @@ var JsonApiFormat = (function () {
   }
 
   /**
+   * Generate a pagination url.
+   *
+   * @return {String}
+   */
+
+  JsonApiFormat.prototype.paginationUrl = function paginationUrl(size, number) {
+    return this.baseUrl + '/?page[size]=' + size + '&page[number]=' + number;
+  };
+
+  /**
    * Generate self-referencing url.
    *
    * @param {*} model - a model
@@ -87,6 +97,7 @@ var JsonApiFormat = (function () {
     var singleResult = opts.singleResult;
     var relations = opts.relations;
     var mode = opts.mode;
+    var page = opts.page;
 
     var links = undefined;
     if (mode === 'relation') {
@@ -106,6 +117,23 @@ var JsonApiFormat = (function () {
     var included = undefined;
     if (relations && relations.length) {
       included = this.include(input, relations);
+    }
+    if (data && Array.isArray(data) && page) {
+      var size = isNaN(page.size) ? data.length : page.size;
+      var pages = size === 0 ? 1 : Math.ceil(data.length / size);
+      var number = Math.min(Math.max(page.number, 1), pages);
+
+      if (!links) {
+        links = {};
+      }
+      links.first = this.paginationUrl(size, 1);
+      links.last = this.paginationUrl(size, pages);
+      links.prev = number > 1 ? this.paginationUrl(size, number - 1) : null;
+      links.next = number < pages - 1 ? this.paginationUrl(size, number + 1) : null;
+
+      if (data.length !== size) {
+        data = data.slice((number - 1) * size, number * size);
+      }
     }
     return {
       data: data,

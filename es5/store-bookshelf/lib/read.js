@@ -61,6 +61,7 @@ function read(model) {
       result.baseType = query.baseType;
       result.baseId = query.baseId;
       result.baseRelation = query.baseRelation;
+      result.page = query.page ? processPage(query.page) : null;
       return result;
     });
   });
@@ -95,5 +96,13 @@ function processSort(validFields, query, sortBy) {
     var dir = isAscending(key) ? 'ASC' : 'DESC';
     return column ? result.orderBy(column, dir) : result;
   }, query).value();
+}
+
+function processPage(page) {
+  var number = page.number ? parseInt(page.number) : 1;
+  return {
+    size: page.size ? Math.max(0, parseInt(page.size)) : NaN,
+    number: isNaN(number) ? 1 : number
+  };
 }
 module.exports = exports['default'];

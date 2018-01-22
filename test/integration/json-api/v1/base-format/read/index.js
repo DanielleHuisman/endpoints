@@ -531,14 +531,52 @@ describe('read', function() {
       });
     });
 
-    // TODO: Pagination
     describe('pagination', function() {
-      it('should limit the number of resources returned in a response to a subset of the whole set available');
-      it('should provide links to traverse a paginated data set');
+      it('should limit the number of resources returned in a response to a subset of the whole set available', function() {
+        return Agent.request('GET', '/v1/books/?page[size]=3&page[number]=2')
+          .promise()
+          .then(function(res) {
+            expect(res.body.data.length).to.equal(3);
+            expect(res.body.data[0].id).to.equal('4');
+          });
+      });
+      it('should provide links to traverse a paginated data set', function() {
+        return Agent.request('GET', '/v1/books/?page[size]=3')
+          .promise()
+          .then(function(res) {
+            expect(res.body)
+              .to.have.property('links')
+                .that.is.a('object');
+          });
+      });
       it('must put any pagination links on the object that corresponds to a collection');
-      it('must only use "first," "last," "prev," and "next" as keys for pagination links');
-      it('must omit or set values to null for links that are unavailable');
-      it('must remain consistent with the sorting rules');
+      it('must only use "first," "last," "prev," and "next" as keys for pagination links', function() {
+        return Agent.request('GET', '/v1/books/?page[size]=3&page[number]=2')
+          .promise()
+          .then(function(res) {
+            expect(res.body.links.first).to.equal('/v1/books/?page[size]=3&page[number]=1');
+            expect(res.body.links.last).to.equal('/v1/books/?page[size]=3&page[number]=4');
+            expect(res.body.links.prev).to.equal('/v1/books/?page[size]=3&page[number]=1');
+            expect(res.body.links.next).to.equal('/v1/books/?page[size]=3&page[number]=3');
+          });
+      });
+      it('must omit or set values to null for links that are unavailable', function() {
+        return Agent.request('GET', '/v1/books/?page[size]=3&page[number]=1')
+          .promise()
+          .then(function(res) {
+            expect(res.body.links)
+              .to.have.property('prev')
+                .that.is.null;
+          });
+      });
+      it('must remain consistent with the sorting rules', function() {
+        return Agent.request('GET', '/v1/books/?sort=-date_published,+title&page[size]=1&page[number]=2')
+          .promise()
+          .then(function(res) {
+            expect(res.body.data.length).to.equal(1);
+            expect(res.body.data[0].attributes.title).to.equal('Harry Potter and the Half-Blood Prince');
+          });
+      });
     });
 
     describe('filtering', function() {

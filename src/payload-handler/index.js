@@ -39,7 +39,8 @@ class PayloadHandler {
         mode: data.mode,
         baseType: data.baseType,
         baseId: data.baseId,
-        baseRelation: data.baseRelation
+        baseRelation: data.baseRelation,
+        page: data.page
       })
     };
   }

@@ -1,7 +1,7 @@
 {
   "name": "@danielhuisman/endpoints",
   "description": "a hypermedia API framework for javascript.",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "homepage": "https://github.com/endpoints/endpoints",
   "author": {
     "name": "Tyler Kellen",

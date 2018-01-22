@@ -104,7 +104,7 @@ class JsonApiFormat {
       links.first = this.paginationUrl(size, 1);
       links.last = this.paginationUrl(size, pages);
       links.prev = number > 1 ? this.paginationUrl(size, number - 1) : null;
-      links.next = number < pages - 1 ? this.paginationUrl(size, number + 1) : null;
+      links.next = number < pages ? this.paginationUrl(size, number + 1) : null;
 
       if (data.length !== size) {
         data = data.slice((number - 1) * size, number * size);
